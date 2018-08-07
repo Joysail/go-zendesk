@@ -2,6 +2,7 @@ package zendesk
 
 import (
 	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/google/go-querystring/query"
@@ -74,4 +75,11 @@ func (c *client) ListOrganizations(opts *ListOptions) ([]Organization, error) {
 // Zendesk Core API docs: https://developer.zendesk.com/rest_api/docs/core/organizations#delete-organization
 func (c *client) DeleteOrganization(id int64) error {
 	return c.delete(fmt.Sprintf("/api/v2/organizations/%d.json", id), nil)
+}
+
+func (c *client) AutocompleteOrganizations(name string) ([]Organization, error) {
+	out := new(APIPayload)
+	name = url.QueryEscape(name)
+	err := c.get("/api/v2/organizations/autocomplete.json?name="+name, out)
+	return out.Organizations, err
 }
